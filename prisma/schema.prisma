@@ -1,0 +1,157 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User entity - based on Requirements.md
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  password        String
+  role            String   @default("user") // admin, user
+  full_name       String
+  profile_picture String?
+  location        String
+  gender          String   // femenino, masculino, otro
+  phone           String
+  rating          Float    @default(0.0)
+  total_reviews   Int      @default(0)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  // Relations
+  products       Product[]
+  purchases_made Purchase[] @relation("Buyer")
+  purchases_sold Purchase[] @relation("Seller")
+  questions      Question[]
+  answers        Answer[]
+  reviews_given  Review[]   @relation("Reviewer")
+  reviews_received Review[] @relation("ReviewedUser")
+  chat_messages  ChatMessage[]
+
+  @@map("users")
+}
+
+// Product entity - inferred from component usage
+model Product {
+  id          String   @id @default(cuid())
+  title       String
+  category    String   // camisas, pantalones, vestidos, zapatos, chaquetas, accesorios, deportiva, otro
+  description String
+  price       Int      // Price in Costa Rican colones
+  size        String
+  condition   String   // nuevo, poco_uso, usado
+  location    String
+  gender      String   // femenino, masculino, otro
+  images      String   // JSON array of image URLs
+  status      String   @default("available") // available, reserved, sold
+  featured    Boolean  @default(false)
+  seller_id   String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relations
+  seller    User       @relation(fields: [seller_id], references: [id], onDelete: Cascade)
+  questions Question[]
+  purchases Purchase[]
+
+  @@map("products")
+}
+
+// Question entity - from EcoTrade-base/entities/Question
+model Question {
+  id           String   @id @default(cuid())
+  product_id   String
+  user_id      String
+  question     String
+  user_name    String
+  created_date DateTime @default(now())
+
+  // Relations
+  product Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@map("questions")
+}
+
+// Answer entity - from EcoTrade-base/entities/Answer
+model Answer {
+  id           String   @id @default(cuid())
+  question_id  String
+  user_id      String
+  answer       String
+  user_name    String
+  created_date DateTime @default(now())
+
+  // Relations
+  question Question @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("answers")
+}
+
+// Purchase entity - from EcoTrade-base/entities/Purchase
+model Purchase {
+  id          String   @id @default(cuid())
+  product_id  String
+  buyer_id    String
+  seller_id   String
+  buyer_name  String
+  buyer_email String
+  buyer_phone String?
+  status      String   @default("pending") // pending, confirmed, completed, cancelled
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relations
+  product       Product       @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  buyer         User          @relation("Buyer", fields: [buyer_id], references: [id], onDelete: Cascade)
+  seller        User          @relation("Seller", fields: [seller_id], references: [id], onDelete: Cascade)
+  chat_messages ChatMessage[]
+  reviews       Review[]
+
+  @@map("purchases")
+}
+
+// Review entity - from EcoTrade-base/entities/Review
+model Review {
+  id               String   @id @default(cuid())
+  reviewer_id      String
+  reviewed_user_id String
+  purchase_id      String?
+  rating           Int      // 1-5 stars
+  comment          String?
+  reviewer_name    String
+  created_at       DateTime @default(now())
+
+  // Relations
+  reviewer      User      @relation("Reviewer", fields: [reviewer_id], references: [id], onDelete: Cascade)
+  reviewed_user User      @relation("ReviewedUser", fields: [reviewed_user_id], references: [id], onDelete: Cascade)
+  purchase      Purchase? @relation(fields: [purchase_id], references: [id], onDelete: SetNull)
+
+  @@map("reviews")
+}
+
+// ChatMessage entity - from EcoTrade-base/entities/ChatMessage
+model ChatMessage {
+  id          String   @id @default(cuid())
+  purchase_id String
+  sender_id   String
+  message     String
+  sender_name String
+  created_at  DateTime @default(now())
+
+  // Relations
+  purchase Purchase @relation(fields: [purchase_id], references: [id], onDelete: Cascade)
+  sender   User     @relation(fields: [sender_id], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
