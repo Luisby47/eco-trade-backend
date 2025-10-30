@@ -47,8 +47,7 @@ export class ProductsController {
     @Query('maxPrice', new DefaultValuePipe(999999), ParseIntPipe)
     maxPrice?: number,
     @Query('search') search?: string,
-    @Query('featured', new DefaultValuePipe(false), ParseBoolPipe)
-    featured?: boolean,
+    @Query('featured') featured?: string,
     @Query('status', new DefaultValuePipe('available')) status?: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
     @Query('limit', new DefaultValuePipe(12), ParseIntPipe) limit?: number,
@@ -56,6 +55,12 @@ export class ProductsController {
     @Query('sortOrder', new DefaultValuePipe('desc'))
     sortOrder?: 'asc' | 'desc',
   ) {
+    // Convert featured string to boolean only if provided
+    let featuredBoolean: boolean | undefined = undefined;
+    if (featured !== undefined && featured !== null && featured !== '') {
+      featuredBoolean = featured === 'true' || featured === '1';
+    }
+
     const filters = {
       category,
       condition,
@@ -64,7 +69,7 @@ export class ProductsController {
       minPrice: minPrice || undefined,
       maxPrice: maxPrice !== 999999 ? maxPrice : undefined,
       search,
-      featured,
+      featured: featuredBoolean,
       status,
       page,
       limit,

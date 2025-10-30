@@ -35,6 +35,7 @@ model User {
   reviews_given  Review[]   @relation("Reviewer")
   reviews_received Review[] @relation("ReviewedUser")
   chat_messages  ChatMessage[]
+  subscriptions  Subscription[]
 
   @@map("users")
 }
@@ -154,4 +155,26 @@ model ChatMessage {
   sender   User     @relation(fields: [sender_id], references: [id], onDelete: Cascade)
 
   @@map("chat_messages")
+}
+
+// Subscription entity - User subscription plans
+model Subscription {
+  id                      String   @id @default(cuid())
+  user_id                 String
+  plan                    String   // basico, premium, profesional
+  billing_cycle           String   // mensual, anual
+  price                   Int      // Price paid in colones
+  start_date              DateTime @default(now())
+  end_date                DateTime
+  status                  String   @default("activa") // activa, cancelada, expirada
+  featured_products_limit Int      @default(1) // Límite de productos destacados
+  products_limit          Int      @default(10) // Límite de productos totales
+  analytics_enabled       Boolean  @default(false) // Acceso a estadísticas
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
 }

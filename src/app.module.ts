@@ -10,6 +10,8 @@ import { QuestionsModule } from './questions/questions.module';
 import { AnswersModule } from './answers/answers.module';
 import { PurchasesModule } from './purchases/purchases.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { ChatModule } from './chat/chat.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 /**
  * Main application module
@@ -27,6 +29,8 @@ import { ReviewsModule } from './reviews/reviews.module';
     AnswersModule,
     PurchasesModule,
     ReviewsModule,
+    ChatModule,
+    SubscriptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
