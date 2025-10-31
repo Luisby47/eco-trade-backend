@@ -1,9 +1,9 @@
-import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
-const monthsAgo = (months: number): Date => {
+const monthsAgo = (months) => {
   const date = new Date();
   date.setMonth(date.getMonth() - months);
   return date;
@@ -11,6 +11,7 @@ const monthsAgo = (months: number): Date => {
 
 async function main() {
   console.log('🌱 Iniciando seed de la base de datos...');
+  
   // Limpiar datos existentes
   console.log('🗑️  Limpiando datos existentes...');
   await prisma.chatMessage.deleteMany();
@@ -113,7 +114,7 @@ async function main() {
 
   // Crear productos vendidos de Maria (para estadísticas)
   console.log('📦 Creando productos...');
-  const mariaProducts: any[] = [];
+  const mariaProducts = [];
   
   // Productos vendidos hace 5 meses
   for (let i = 0; i < 3; i++) {
@@ -250,7 +251,7 @@ async function main() {
   console.log(`✅ Creados ${mariaProducts.length} productos de Maria`);
 
   // Crear productos de Carlos
-  const carlosProducts: any[] = [];
+  const carlosProducts = [];
   
   // Productos vendidos en diferentes meses
   for (let month = 5; month >= 1; month--) {
@@ -337,12 +338,12 @@ async function main() {
     },
   });
 
-  const allProducts: any[] = [...mariaProducts, ...carlosProducts, anaProduct, diegoProduct];
+  const allProducts = [...mariaProducts, ...carlosProducts, anaProduct, diegoProduct];
   console.log(`✅ Total de productos: ${allProducts.length}`);
 
   // Crear compras para productos vendidos
   console.log('💰 Creando compras...');
-  const soldProducts: any[] = allProducts.filter((p: any) => p.status === 'sold');
+  const soldProducts = allProducts.filter(p => p.status === 'sold');
   
   for (const product of soldProducts) {
     // Seleccionar un comprador aleatorio diferente al vendedor
@@ -404,7 +405,6 @@ async function main() {
     }
 
     const seller = users.find(u => u.id === product.seller_id);
-    if (!seller) continue;
 
     const question = await prisma.question.create({
       data: {

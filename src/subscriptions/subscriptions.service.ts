@@ -18,11 +18,14 @@ export class SubscriptionsService {
    * Create a new subscription
    */
   async create(createSubscriptionDto: CreateSubscriptionDto, userId: string) {
-    // Check if user has an active subscription
+    // Check if user has an active PAID subscription (not basico)
     const existingSubscription = await this.prisma.subscription.findFirst({
       where: {
         user_id: userId,
         status: 'activa',
+        plan: {
+          not: 'basico',
+        },
       },
     });
 

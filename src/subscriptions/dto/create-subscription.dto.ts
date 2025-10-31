@@ -1,4 +1,5 @@
 import { IsString, IsInt, IsIn, IsBoolean, IsDateString, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 /**
  * Data Transfer Object for creating a subscription
@@ -16,6 +17,7 @@ export class CreateSubscriptionDto {
   })
   billing_cycle: string;
 
+  @Type(() => Number)
   @IsInt({ message: 'Precio debe ser un número entero' })
   @Min(0, { message: 'Precio debe ser mayor o igual a 0' })
   price: number;
@@ -26,14 +28,17 @@ export class CreateSubscriptionDto {
   @IsDateString({}, { message: 'Fecha de fin debe ser una fecha válida' })
   end_date: string;
 
+  @Type(() => Number)
   @IsInt({ message: 'Límite de productos destacados debe ser un número entero' })
   @Min(0, { message: 'Límite debe ser mayor o igual a 0' })
   featured_products_limit: number;
 
+  @Type(() => Number)
   @IsInt({ message: 'Límite de productos debe ser un número entero' })
   @Min(1, { message: 'Límite debe ser mayor o igual a 1' })
   products_limit: number;
 
+  @Type(() => Boolean)
   @IsBoolean({ message: 'Analytics enabled debe ser booleano' })
   analytics_enabled: boolean;
 }
